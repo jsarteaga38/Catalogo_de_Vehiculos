@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using Catalogo_de_Vehiculo.Modelos;
+using Catalogo_de_Vehiculo.Domain.Entities;
+using Catalogo_de_Vehiculo.Domain.Interfaces;
 
-namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
+namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
 {
     public class VehiculoRepository : IVehiculoRepository<Vehiculo>
     {

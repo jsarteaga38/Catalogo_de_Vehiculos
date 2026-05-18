@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using Catalogo_de_Vehiculo.Modelos;
+using Catalogo_de_Vehiculo.Domain.Entities;
+using Catalogo_de_Vehiculo.Domain.Interfaces;
 
-namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
+namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
 {
     public class CamionRepository : VehiculoRepository, ICamionRepository
     {
@@ -19,6 +20,21 @@ namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
             throw new NotImplementedException();
         }
 
+        public void Eliminar(Camion vehiculo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Camion? BuscarPorMarca(string marca)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Camion> ObtenerTodos()
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Camion> BuscarPorPesoMaximo(double pesoMaximo)
         {
             List<Camion> lista = new List<Camion>();
@@ -29,10 +45,8 @@ namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
             {
                 using var conn = new SqlConnection(_connectionString);
                 using var cmd = new SqlCommand(sql, conn);
-
                 cmd.Parameters.AddWithValue("@PesoMaximo", pesoMaximo);
                 conn.Open();
-
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -51,21 +65,6 @@ namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
                 throw new Exception("Error al buscar por peso: " + ex.Message);
             }
             return lista;
-        }
-
-        public void Eliminar(Camion vehiculo)
-        {
-            throw new NotImplementedException();
-        }
-
-        Camion? IVehiculoRepository<Camion>.BuscarPorMarca(string marca)
-        {
-            throw new NotImplementedException();
-        }
-
-        List<Camion> IVehiculoRepository<Camion>.ObtenerTodos()
-        {
-            throw new NotImplementedException();
         }
     }
 }

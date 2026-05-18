@@ -1,14 +1,10 @@
-using Catalogo_de_Vehiculo.Modelos;
-using Catalogo_de_Vehiculo.ServicioVehiculos;
-using Catalogo_de_Vehiculo.Repositorios.Implementaciones;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+using Catalogo_de_Vehiculo.Domain.Entities;
+using Catalogo_de_Vehiculo.Application.Services;
+using Catalogo_de_Vehiculo.Infrastructure.Repositories;
 
-namespace Catalogo_de_Vehiculo
+namespace Catalogo_de_Vehiculo.Presentation.Forms
 {
-    public partial class Form1 : Form
+    public partial class FormPrincipal : Form
     {
         private ServicioVehiculo servicio;
         private VehiculoRepository repositorio;
@@ -30,7 +26,7 @@ namespace Catalogo_de_Vehiculo
         private GroupBox grpResultados;
         private DataGridView dgvVehiculos;
 
-        public Form1()
+        public FormPrincipal()
         {
             servicio = new ServicioVehiculo();
 

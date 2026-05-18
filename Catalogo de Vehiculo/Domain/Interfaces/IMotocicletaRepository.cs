@@ -1,6 +1,5 @@
-﻿using Catalogo_de_Vehiculo.Modelos;
-
-namespace Catalogo_de_Vehiculo.Repositorios
+﻿using Catalogo_de_Vehiculo.Domain.Entities;
+namespace Catalogo_de_Vehiculo.Domain.Interfaces
 {
     /// <summary>
     /// Repositorio específico para Motocicleta.

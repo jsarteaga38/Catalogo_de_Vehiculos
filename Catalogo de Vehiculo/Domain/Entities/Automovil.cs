@@ -1,6 +1,7 @@
 ﻿using System;
+using Catalogo_de_Vehiculo.Domain.Entities;
 
-namespace Catalogo_de_Vehiculo.Modelos
+namespace Catalogo_de_Vehiculo.Domain.Entities
 {
     public class Automovil : Vehiculo
     {

@@ -1,4 +1,6 @@
-﻿namespace Catalogo_de_Vehiculo.Repositorios
+﻿using Catalogo_de_Vehiculo.Domain.Entities;
+
+namespace Catalogo_de_Vehiculo.Domain.Interfaces
 {
     /// <summary>
     /// Interfaz genérica base para operaciones CRUD sobre vehículos.

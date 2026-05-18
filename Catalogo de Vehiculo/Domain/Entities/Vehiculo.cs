@@ -1,4 +1,5 @@
-﻿namespace Catalogo_de_Vehiculo.Modelos
+﻿namespace Catalogo_de_Vehiculo.Domain.Entities
+
 {
     public abstract class Vehiculo
     {

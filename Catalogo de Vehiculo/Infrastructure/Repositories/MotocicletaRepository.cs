@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using Catalogo_de_Vehiculo.Modelos;
+using Catalogo_de_Vehiculo.Domain.Entities;
+using Catalogo_de_Vehiculo.Domain.Interfaces;
 
-namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
+namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
 {
     public class MotocicletaRepository : VehiculoRepository, IMotocicletaRepository
     {
@@ -15,6 +16,21 @@ namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
         }
 
         public void Agregar(Motocicleta vehiculo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Eliminar(Motocicleta vehiculo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Motocicleta? BuscarPorMarca(string marca)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Motocicleta> ObtenerTodos()
         {
             throw new NotImplementedException();
         }
@@ -49,21 +65,6 @@ namespace Catalogo_de_Vehiculo.Repositorios.Implementaciones
                 throw new Exception("Error al buscar por tipo: " + ex.Message);
             }
             return lista;
-        }
-
-        public void Eliminar(Motocicleta vehiculo)
-        {
-            throw new NotImplementedException();
-        }
-
-        Motocicleta? IVehiculoRepository<Motocicleta>.BuscarPorMarca(string marca)
-        {
-            throw new NotImplementedException();
-        }
-
-        List<Motocicleta> IVehiculoRepository<Motocicleta>.ObtenerTodos()
-        {
-            throw new NotImplementedException();
         }
     }
 }

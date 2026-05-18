@@ -1,6 +1,6 @@
-﻿using Catalogo_de_Vehiculo.Modelos;
+﻿using Catalogo_de_Vehiculo.Domain.Entities;
 
-namespace Catalogo_de_Vehiculo.Repositorios
+namespace Catalogo_de_Vehiculo.Domain.Interfaces
 {
     /// <summary>
     /// Repositorio específico para Automovil.

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Catalogo_de_Vehiculo.Modelos;
+using Catalogo_de_Vehiculo.Domain.Entities;
+using Catalogo_de_Vehiculo.Domain.Interfaces;
 
-namespace Catalogo_de_Vehiculo.ServicioVehiculos
+namespace Catalogo_de_Vehiculo.Application.Services
 {
     internal class ServicioVehiculo
     {
