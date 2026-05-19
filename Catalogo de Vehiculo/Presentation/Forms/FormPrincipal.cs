@@ -1,6 +1,7 @@
 using Catalogo_de_Vehiculo.Domain.Entities;
 using Catalogo_de_Vehiculo.Application.Services;
 using Catalogo_de_Vehiculo.Infrastructure.Repositories;
+using Catalogo_de_Vehiculo.Domain.Factories;
 
 namespace Catalogo_de_Vehiculo.Presentation.Forms
 {
@@ -249,8 +250,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        private Vehiculo CrearVehiculo()
+        // Se modifica el método CrearVehiculo para validar los datos de entrada y mostrar mensajes de error específicos para cada campo. Esto mejora la experiencia del usuario al registrar un vehículo.
+        private Vehiculo? CrearVehiculo()
         {
             if (comboTipo.SelectedItem == null)
                 return null;
@@ -269,38 +270,17 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                 return null;
             }
 
-            string tipo = comboTipo.SelectedItem.ToString();
+            string tipo = comboTipo.SelectedItem.ToString()!;
 
-            if (tipo == "Camion")
-            {
-                if (!double.TryParse(txtCaracteristica.Text, out double peso))
-                {
-                    MessageBox.Show("El peso debe ser un número válido.", "Dato inválido",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return null;
-                }
-                return new Camion(txtMarca.Text, txtModelo.Text, año, precio, txtColor.Text, peso);
-            }
-
-            if (tipo == "Automovil")
-            {
-                if (!int.TryParse(txtCaracteristica.Text, out int puertas))
-                {
-                    MessageBox.Show("El número de puertas debe ser un entero válido.", "Dato inválido",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return null;
-                }
-                return new Automovil(txtMarca.Text, txtModelo.Text, año, precio, txtColor.Text, puertas);
-            }
-
-            if (tipo == "Motocicleta")
-            {
-                return new Motocicleta(
-                    txtMarca.Text, txtModelo.Text, año, precio,
-                    txtColor.Text, txtCaracteristica.Text);
-            }
-
-            return null;
+            return VehiculoFactory.Crear(
+                tipo,
+                txtMarca.Text,
+                txtModelo.Text,
+                año,
+                precio,
+                txtColor.Text,
+                txtCaracteristica.Text
+            );
         }
 
         private void MostrarEnGrid()
