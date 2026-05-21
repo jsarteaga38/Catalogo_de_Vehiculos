@@ -2,12 +2,13 @@ using Catalogo_de_Vehiculo.Domain.Entities;
 using Catalogo_de_Vehiculo.Application.Services;
 using Catalogo_de_Vehiculo.Infrastructure.Repositories;
 using Catalogo_de_Vehiculo.Domain.Factories;
+using Catalogo_de_Vehiculo.Domain.Interfaces;
 
 namespace Catalogo_de_Vehiculo.Presentation.Forms
 {
-    public partial class FormPrincipal : Form
+    public partial class FormPrincipal : Form, ICatalogoObserver
     {
-        private ServicioVehiculo servicio;
+        private readonly CatalogoService _servicio;
         private VehiculoRepository repositorio;
 
         private ComboBox comboTipo;
@@ -29,14 +30,19 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
         public FormPrincipal()
         {
-            servicio = new ServicioVehiculo();
-
             string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CatalogoVehiculos;Integrated Security=True;Trust Server Certificate=True";
             repositorio = new VehiculoRepository(connectionString);
+            _servicio = new CatalogoService(repositorio);
+            _servicio.Suscribir(this);
 
             InicializarUI();
             WireEvents();
             UpdateUIState();
+        }
+
+        public void OnCatalogoActualizado(string mensaje)
+        {
+            MostrarEnGrid();
         }
 
         private void InicializarUI()
@@ -157,7 +163,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                 return;
             }
 
-            string tipo = comboTipo.SelectedItem.ToString();
+            string tipo = comboTipo.SelectedItem.ToString()!;
             txtCaracteristica.Visible = true;
 
             switch (tipo)
@@ -180,11 +186,10 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         {
             try
             {
-                Vehiculo vehiculo = CrearVehiculo();
+                Vehiculo? vehiculo = CrearVehiculo();
                 if (vehiculo == null) return;
 
-                repositorio.Agregar(vehiculo);  // ← guarda en base de datos
-                MostrarEnGrid();
+                _servicio.AgregarVehiculo(vehiculo);
                 LimpiarCampos();
 
                 MessageBox.Show("Vehículo registrado correctamente.", "Éxito",
@@ -209,13 +214,11 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
-            Vehiculo encontrado = repositorio.BuscarPorMarca(txtBuscarMarca.Text);  // ← busca en base de datos
+            Vehiculo? encontrado = _servicio.BuscarPorMarca(txtBuscarMarca.Text);
 
             if (encontrado != null)
             {
-                List<Vehiculo> lista = new List<Vehiculo> { encontrado };
-                dgvVehiculos.Rows.Clear();
-                MostrarLista(lista);
+                MostrarLista(new List<Vehiculo> { encontrado });
             }
             else
             {
@@ -226,7 +229,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
         private void BtnEliminar_Click(object sender, EventArgs e)
         {
-            Vehiculo encontrado = repositorio.BuscarPorMarca(txtBuscarMarca.Text);  // ← busca en base de datos
+            Vehiculo? encontrado = _servicio.BuscarPorMarca(txtBuscarMarca.Text);
 
             if (encontrado != null)
             {
@@ -238,8 +241,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
                 if (confirm == DialogResult.Yes)
                 {
-                    repositorio.Eliminar(encontrado);  // ← elimina de base de datos
-                    MostrarEnGrid();
+                    _servicio.EliminarVehiculo(encontrado);
                     MessageBox.Show("Vehículo eliminado correctamente.", "Éxito",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -250,7 +252,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-        // Se modifica el método CrearVehiculo para validar los datos de entrada y mostrar mensajes de error específicos para cada campo. Esto mejora la experiencia del usuario al registrar un vehículo.
+
         private Vehiculo? CrearVehiculo()
         {
             if (comboTipo.SelectedItem == null)
@@ -285,7 +287,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
         private void MostrarEnGrid()
         {
-            List<Vehiculo> lista = repositorio.ObtenerTodos();  // ← trae de base de datos
+            List<Vehiculo> lista = _servicio.ObtenerTodos();
             MostrarLista(lista);
         }
 

@@ -1,54 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Catalogo_de_Vehiculo.Domain.Entities;
 using Catalogo_de_Vehiculo.Domain.Interfaces;
 
 namespace Catalogo_de_Vehiculo.Application.Services
 {
-    internal class ServicioVehiculo
+    /// <summary>
+    /// Servicio principal del catálogo.
+    /// Implementa ICatalogoObservable para notificar cambios (patrón Observer).
+    /// </summary>
+    public class CatalogoService : ICatalogoObservable
     {
-        private List<Vehiculo> vehiculos;
+        private readonly IVehiculoRepository<Vehiculo> _repositorio;
+        private readonly List<ICatalogoObserver> _observadores = new();
 
-        public ServicioVehiculo()
+        public CatalogoService(IVehiculoRepository<Vehiculo> repositorio)
         {
-            vehiculos = new List<Vehiculo>();
+            _repositorio = repositorio;
         }
 
+        // ── Observer ────────────────────────────────────────────
+        public void Suscribir(ICatalogoObserver observer)
+        {
+            if (!_observadores.Contains(observer))
+                _observadores.Add(observer);
+        }
+
+        public void Desuscribir(ICatalogoObserver observer)
+        {
+            _observadores.Remove(observer);
+        }
+
+        public void Notificar(string mensaje)
+        {
+            foreach (ICatalogoObserver obs in _observadores)
+                obs.OnCatalogoActualizado(mensaje);
+        }
+
+        // ── Operaciones del catálogo ────────────────────────────
         public void AgregarVehiculo(Vehiculo vehiculo)
         {
-            // RN-01: No se puede agregar un vehículo nulo
-            if (vehiculo != null)
-                vehiculos.Add(vehiculo);
+            if (vehiculo == null) return;
+            _repositorio.Agregar(vehiculo);
+            Notificar($"Vehículo agregado: {vehiculo.Marca} {vehiculo.Modelo}");
         }
 
         public void EliminarVehiculo(Vehiculo vehiculo)
         {
-            if (vehiculo != null)
-                vehiculos.Remove(vehiculo);
+            if (vehiculo == null) return;
+            _repositorio.Eliminar(vehiculo);
+            Notificar($"Vehículo eliminado: {vehiculo.Marca} {vehiculo.Modelo}");
         }
 
         public Vehiculo? BuscarPorMarca(string marca)
         {
-            if (string.IsNullOrWhiteSpace(marca))
-                return null;
+            if (string.IsNullOrWhiteSpace(marca)) return null;
+            return _repositorio.BuscarPorMarca(marca);
+        }
 
-            foreach (Vehiculo v in vehiculos)
-            {
-                if (!string.IsNullOrEmpty(v.Marca) &&
-                    v.Marca.Equals(marca, StringComparison.OrdinalIgnoreCase))
-                {
-                    return v;
-                }
-            }
+        public List<Vehiculo> ObtenerTodos()
+        {
+            return _repositorio.ObtenerTodos();
+        }
 
-            return null;
+        public double CalcularValorActualTotal()
+        {
+            return _repositorio.CalcularValorActualTotal();
         }
 
         public double CalcularTotalDepreciacion()
         {
             double total = 0;
-            foreach (Vehiculo v in vehiculos)
+            foreach (Vehiculo v in ObtenerTodos())
                 total += v.CalcularDepreciacion();
             return total;
         }
@@ -56,33 +79,8 @@ namespace Catalogo_de_Vehiculo.Application.Services
         public double CalcularTotalMantenimiento()
         {
             double total = 0;
-            foreach (Vehiculo v in vehiculos)
+            foreach (Vehiculo v in ObtenerTodos())
                 total += v.CalcularCostoMantenimiento();
-            return total;
-        }
-
-        public string MostrarVehiculos()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (Vehiculo v in vehiculos)
-                sb.AppendLine(v.ToString());
-            return sb.ToString();
-        }
-
-        public List<Vehiculo> ObtenerTodos()
-        {
-            return vehiculos;
-        }
-
-        public double CalcularValorActualTotal()
-        {
-            double total = 0;
-            foreach (Vehiculo v in vehiculos)
-            {
-                // RN-02: Ningún vehículo puede aportar valor negativo al total
-                double valorActual = v.Precio - v.CalcularDepreciacion();
-                total += Math.Max(0, valorActual);
-            }
             return total;
         }
     }
