@@ -1,15 +1,19 @@
-using Catalogo_de_Vehiculo.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using Catalogo_de_Vehiculo.Application.Services;
-using Catalogo_de_Vehiculo.Infrastructure.Repositories;
-using Catalogo_de_Vehiculo.Domain.Factories;
+using Catalogo_de_Vehiculo.Domain.Entities;
 using Catalogo_de_Vehiculo.Domain.Interfaces;
+using Catalogo_de_Vehiculo.Infrastructure.Repositories;
+using Catalogo_de_Vehiculo.Presentation.Presenters;
 
 namespace Catalogo_de_Vehiculo.Presentation.Forms
 {
-    public partial class FormPrincipal : Form, ICatalogoObserver
+    public partial class FormPrincipal : Form, ICatalogoView, ICatalogoObserver
     {
+        private readonly CatalogoPresenter _presenter;
         private readonly CatalogoService _servicio;
-        private VehiculoRepository repositorio;
 
         private ComboBox comboTipo;
         private TextBox txtMarca;
@@ -28,29 +32,93 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         private GroupBox grpResultados;
         private DataGridView dgvVehiculos;
 
+        // ── ICatalogoView ────────────────────────────────────────
+        public string TipoSeleccionado => comboTipo.SelectedItem?.ToString() ?? "";
+        public string Marca => txtMarca.Text;
+        public string Modelo => txtModelo.Text;
+        public string Anio => txtAño.Text;
+        public string Precio => txtPrecio.Text;
+        public string Color => txtColor.Text;
+        public string Caracteristica => txtCaracteristica.Text;
+        public string MarcaBusqueda => txtBuscarMarca.Text;
+
+        public void MostrarVehiculos(List<Vehiculo> lista)
+        {
+            dgvVehiculos.Columns.Clear();
+            dgvVehiculos.Rows.Clear();
+
+            dgvVehiculos.Columns.Add("Marca", "Marca");
+            dgvVehiculos.Columns.Add("Modelo", "Modelo");
+            dgvVehiculos.Columns.Add("Año", "Año");
+            dgvVehiculos.Columns.Add("Precio", "Precio ($)");
+            dgvVehiculos.Columns.Add("Color", "Color");
+            dgvVehiculos.Columns.Add("Caracteristica", "Característica");
+            dgvVehiculos.Columns.Add("Depreciacion", "Depreciación ($)");
+            dgvVehiculos.Columns.Add("ValorActual", "Valor Actual ($)");
+
+            foreach (Vehiculo vehiculo in lista)
+            {
+                double depreciacion = vehiculo.CalcularDepreciacion();
+                double valorActual = Math.Max(0, vehiculo.Precio - depreciacion);
+
+                string caracteristica = "";
+                if (vehiculo is Camion camion)
+                    caracteristica = camion.peso + " Ton";
+                else if (vehiculo is Automovil auto)
+                    caracteristica = auto.cantidadPlasas + " Puertas";
+                else if (vehiculo is Motocicleta moto)
+                    caracteristica = moto.tipoMotosicleta;
+
+                dgvVehiculos.Rows.Add(
+                    vehiculo.Marca, vehiculo.Modelo, vehiculo.Año,
+                    vehiculo.Precio.ToString("F2"), vehiculo.Color,
+                    caracteristica, depreciacion.ToString("F2"),
+                    valorActual.ToString("F2")
+                );
+            }
+        }
+
+        public void MostrarMensaje(string mensaje, string titulo, bool esError = false)
+        {
+            MessageBoxIcon icono = esError ? MessageBoxIcon.Warning : MessageBoxIcon.Information;
+            MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, icono);
+        }
+
+        public void LimpiarFormulario()
+        {
+            txtMarca.Clear(); txtModelo.Clear(); txtAño.Clear();
+            txtPrecio.Clear(); txtColor.Clear(); txtCaracteristica.Clear();
+            comboTipo.SelectedIndex = -1;
+            txtCaracteristica.Visible = false;
+        }
+
+        // ── ICatalogoObserver ────────────────────────────────────
+        public void OnCatalogoActualizado(string mensaje)
+        {
+            _presenter.CargarVehiculos();
+        }
+
+        // ── Constructor ──────────────────────────────────────────
         public FormPrincipal()
         {
             string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=CatalogoVehiculos;Integrated Security=True;Trust Server Certificate=True";
-            repositorio = new VehiculoRepository(connectionString);
+            var repositorio = new VehiculoRepository(connectionString);
             _servicio = new CatalogoService(repositorio);
             _servicio.Suscribir(this);
+            _presenter = new CatalogoPresenter(this, _servicio);
 
             InicializarUI();
             WireEvents();
             UpdateUIState();
         }
 
-        public void OnCatalogoActualizado(string mensaje)
-        {
-            MostrarEnGrid();
-        }
-
+        // ── UI ───────────────────────────────────────────────────
         private void InicializarUI()
         {
             this.Text = "Sistema Empresarial - Catálogo de Vehículos";
             this.Size = new Size(900, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(240, 242, 245);
+            this.BackColor = System.Drawing.Color.FromArgb(240, 242, 245);
             this.Font = new Font("Segoe UI", 10);
 
             Size buttonSize = new Size(130, 40);
@@ -73,8 +141,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             txtColor = new TextBox() { Location = new Point(20, 220), Width = 340, PlaceholderText = "Color" };
             txtCaracteristica = new TextBox() { Location = new Point(20, 255), Width = 340, Visible = false };
 
-            btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, Color.FromArgb(46, 134, 193));
-            btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, Color.FromArgb(39, 174, 96));
+            btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, System.Drawing.Color.FromArgb(46, 134, 193));
+            btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, System.Drawing.Color.FromArgb(39, 174, 96));
 
             grpRegistro.Controls.Add(comboTipo);
             grpRegistro.Controls.Add(txtMarca);
@@ -96,8 +164,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             txtBuscarMarca.Width = 340;
             txtBuscarMarca.PlaceholderText = "Buscar por Marca";
 
-            btnBuscar = CrearBoton("Buscar", new Point(20, 90), buttonSize, Color.FromArgb(52, 152, 219));
-            btnEliminar = CrearBoton("Eliminar", new Point(170, 90), buttonSize, Color.FromArgb(192, 57, 43));
+            btnBuscar = CrearBoton("Buscar", new Point(20, 90), buttonSize, System.Drawing.Color.FromArgb(52, 152, 219));
+            btnEliminar = CrearBoton("Eliminar", new Point(170, 90), buttonSize, System.Drawing.Color.FromArgb(192, 57, 43));
 
             grpBusqueda.Controls.Add(txtBuscarMarca);
             grpBusqueda.Controls.Add(btnBuscar);
@@ -112,7 +180,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             dgvVehiculos.Dock = DockStyle.Fill;
             dgvVehiculos.ReadOnly = true;
             dgvVehiculos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvVehiculos.BackgroundColor = Color.White;
+            dgvVehiculos.BackgroundColor = System.Drawing.Color.White;
             dgvVehiculos.AllowUserToAddRows = false;
 
             grpResultados.Controls.Add(dgvVehiculos);
@@ -122,14 +190,14 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(grpResultados);
         }
 
-        private Button CrearBoton(string texto, Point location, Size size, Color color)
+        private Button CrearBoton(string texto, Point location, Size size, System.Drawing.Color colorBoton)
         {
             Button btn = new Button();
             btn.Text = texto;
             btn.Location = location;
             btn.Size = size;
-            btn.BackColor = color;
-            btn.ForeColor = Color.White;
+            btn.BackColor = colorBoton;
+            btn.ForeColor = System.Drawing.Color.White;
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
             btn.Cursor = Cursors.Hand;
@@ -138,11 +206,10 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
         private void WireEvents()
         {
-            btnRegistrar.Click += BtnRegistrar_Click;
-            btnMostrar.Click += BtnMostrar_Click;
-            btnBuscar.Click += BtnBuscar_Click;
-            btnEliminar.Click += BtnEliminar_Click;
-
+            btnRegistrar.Click += (s, e) => _presenter.RegistrarVehiculo();
+            btnMostrar.Click += (s, e) => _presenter.CargarVehiculos();
+            btnBuscar.Click += (s, e) => _presenter.BuscarVehiculo();
+            btnEliminar.Click += (s, e) => _presenter.EliminarVehiculo();
             comboTipo.SelectedIndexChanged += ComboTipo_SelectedIndexChanged;
             txtMarca.TextChanged += (s, e) => UpdateUIState();
         }
@@ -180,167 +247,6 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             }
 
             UpdateUIState();
-        }
-
-        private void BtnRegistrar_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Vehiculo? vehiculo = CrearVehiculo();
-                if (vehiculo == null) return;
-
-                _servicio.AgregarVehiculo(vehiculo);
-                LimpiarCampos();
-
-                MessageBox.Show("Vehículo registrado correctamente.", "Éxito",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show(ex.Message, "Dato inválido",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error inesperado: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void BtnMostrar_Click(object sender, EventArgs e)
-        {
-            MostrarEnGrid();
-        }
-
-        private void BtnBuscar_Click(object sender, EventArgs e)
-        {
-            Vehiculo? encontrado = _servicio.BuscarPorMarca(txtBuscarMarca.Text);
-
-            if (encontrado != null)
-            {
-                MostrarLista(new List<Vehiculo> { encontrado });
-            }
-            else
-            {
-                MessageBox.Show("No se encontró ningún vehículo con esa marca.", "Sin resultados",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void BtnEliminar_Click(object sender, EventArgs e)
-        {
-            Vehiculo? encontrado = _servicio.BuscarPorMarca(txtBuscarMarca.Text);
-
-            if (encontrado != null)
-            {
-                DialogResult confirm = MessageBox.Show(
-                    $"¿Desea eliminar el vehículo {encontrado.Marca} {encontrado.Modelo}?",
-                    "Confirmar eliminación",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (confirm == DialogResult.Yes)
-                {
-                    _servicio.EliminarVehiculo(encontrado);
-                    MessageBox.Show("Vehículo eliminado correctamente.", "Éxito",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            else
-            {
-                MessageBox.Show("No se encontró ningún vehículo con esa marca.", "Sin resultados",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private Vehiculo? CrearVehiculo()
-        {
-            if (comboTipo.SelectedItem == null)
-                return null;
-
-            if (!int.TryParse(txtAño.Text, out int año))
-            {
-                MessageBox.Show("El año debe ser un número entero válido.", "Dato inválido",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return null;
-            }
-
-            if (!double.TryParse(txtPrecio.Text, out double precio))
-            {
-                MessageBox.Show("El precio debe ser un número válido.", "Dato inválido",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return null;
-            }
-
-            string tipo = comboTipo.SelectedItem.ToString()!;
-
-            return VehiculoFactory.Crear(
-                tipo,
-                txtMarca.Text,
-                txtModelo.Text,
-                año,
-                precio,
-                txtColor.Text,
-                txtCaracteristica.Text
-            );
-        }
-
-        private void MostrarEnGrid()
-        {
-            List<Vehiculo> lista = _servicio.ObtenerTodos();
-            MostrarLista(lista);
-        }
-
-        private void MostrarLista(List<Vehiculo> lista)
-        {
-            dgvVehiculos.Columns.Clear();
-            dgvVehiculos.Rows.Clear();
-
-            dgvVehiculos.Columns.Add("Marca", "Marca");
-            dgvVehiculos.Columns.Add("Modelo", "Modelo");
-            dgvVehiculos.Columns.Add("Año", "Año");
-            dgvVehiculos.Columns.Add("Precio", "Precio ($)");
-            dgvVehiculos.Columns.Add("Color", "Color");
-            dgvVehiculos.Columns.Add("Caracteristica", "Característica");
-            dgvVehiculos.Columns.Add("Depreciacion", "Depreciación ($)");
-            dgvVehiculos.Columns.Add("ValorActual", "Valor Actual ($)");
-
-            foreach (Vehiculo vehiculo in lista)
-            {
-                double depreciacion = vehiculo.CalcularDepreciacion();
-                double valorActual = Math.Max(0, vehiculo.Precio - depreciacion);
-
-                string caracteristica = "";
-                if (vehiculo is Camion camion)
-                    caracteristica = camion.peso + " Ton";
-                else if (vehiculo is Automovil auto)
-                    caracteristica = auto.cantidadPlasas + " Puertas";
-                else if (vehiculo is Motocicleta moto)
-                    caracteristica = moto.tipoMotosicleta;
-
-                dgvVehiculos.Rows.Add(
-                    vehiculo.Marca,
-                    vehiculo.Modelo,
-                    vehiculo.Año,
-                    vehiculo.Precio.ToString("F2"),
-                    vehiculo.Color,
-                    caracteristica,
-                    depreciacion.ToString("F2"),
-                    valorActual.ToString("F2")
-                );
-            }
-        }
-
-        private void LimpiarCampos()
-        {
-            txtMarca.Clear();
-            txtModelo.Clear();
-            txtAño.Clear();
-            txtPrecio.Clear();
-            txtColor.Clear();
-            txtCaracteristica.Clear();
-            comboTipo.SelectedIndex = -1;
-            txtCaracteristica.Visible = false;
         }
     }
 }
