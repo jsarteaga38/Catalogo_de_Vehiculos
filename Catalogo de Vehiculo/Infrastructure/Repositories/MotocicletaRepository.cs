@@ -15,24 +15,49 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
             _connectionString = connectionString;
         }
 
-        public void Agregar(Motocicleta vehiculo)
+        public new void Agregar(Motocicleta vehiculo)
         {
-            throw new NotImplementedException();
+            base.Agregar(vehiculo);
         }
 
-        public void Eliminar(Motocicleta vehiculo)
+        public new void Eliminar(Motocicleta vehiculo)
         {
-            throw new NotImplementedException();
+            base.Eliminar(vehiculo);
         }
 
-        public Motocicleta? BuscarPorMarca(string marca)
+        public new Motocicleta? BuscarPorMarca(string marca)
         {
-            throw new NotImplementedException();
+            Vehiculo? v = base.BuscarPorMarca(marca);
+            return v as Motocicleta;
         }
 
-        public List<Motocicleta> ObtenerTodos()
+        public new List<Motocicleta> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            List<Motocicleta> lista = new List<Motocicleta>();
+            string sql = "SELECT * FROM Vehiculos WHERE Tipo = 'Motocicleta'";
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(new Motocicleta(
+                        reader["Marca"].ToString()!,
+                        reader["Modelo"].ToString()!,
+                        Convert.ToInt32(reader["Año"]),
+                        Convert.ToDouble(reader["Precio"]),
+                        reader["Color"].ToString()!,
+                        reader["Caracteristica"].ToString()!
+                    ));
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error al obtener motocicletas: " + ex.Message);
+            }
+            return lista;
         }
 
         public List<Motocicleta> BuscarPorTipo(string tipo)
@@ -65,6 +90,14 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
                 throw new Exception("Error al buscar por tipo: " + ex.Message);
             }
             return lista;
+        }
+
+        public double CalcularValorActualTotal()
+        {
+            double total = 0;
+            foreach (Motocicleta m in ObtenerTodos())
+                total += Math.Max(0, m.Precio - m.CalcularDepreciacion());
+            return total;
         }
     }
 }
