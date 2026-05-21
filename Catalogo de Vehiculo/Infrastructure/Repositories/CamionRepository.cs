@@ -15,24 +15,50 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
             _connectionString = connectionString;
         }
 
-        public void Agregar(Camion vehiculo)
+        public new void Agregar(Camion vehiculo)
         {
-            throw new NotImplementedException();
+            base.Agregar(vehiculo);
         }
 
-        public void Eliminar(Camion vehiculo)
+        public new void Eliminar(Camion vehiculo)
         {
-            throw new NotImplementedException();
+            base.Eliminar(vehiculo);
         }
 
-        public Camion? BuscarPorMarca(string marca)
+        public new Camion? BuscarPorMarca(string marca)
         {
-            throw new NotImplementedException();
+            Vehiculo? v = base.BuscarPorMarca(marca);
+            return v as Camion;
         }
 
-        public List<Camion> ObtenerTodos()
+        public new List<Camion> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            List<Camion> lista = new List<Camion>();
+            string sql = "SELECT * FROM Vehiculos WHERE Tipo = 'Camion'";
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    double peso = double.TryParse(reader["Caracteristica"].ToString(), out double p) ? p : 0;
+                    lista.Add(new Camion(
+                        reader["Marca"].ToString()!,
+                        reader["Modelo"].ToString()!,
+                        Convert.ToInt32(reader["Año"]),
+                        Convert.ToDouble(reader["Precio"]),
+                        reader["Color"].ToString()!,
+                        peso
+                    ));
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error al obtener camiones: " + ex.Message);
+            }
+            return lista;
         }
 
         public List<Camion> BuscarPorPesoMaximo(double pesoMaximo)
@@ -65,6 +91,14 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
                 throw new Exception("Error al buscar por peso: " + ex.Message);
             }
             return lista;
+        }
+
+        public double CalcularValorActualTotal()
+        {
+            double total = 0;
+            foreach (Camion c in ObtenerTodos())
+                total += Math.Max(0, c.Precio - c.CalcularDepreciacion());
+            return total;
         }
     }
 }
