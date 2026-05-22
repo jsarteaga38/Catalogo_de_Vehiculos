@@ -28,11 +28,19 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         private Button btnBuscar;
         private Button btnEliminar;
         private Button btnDashboard;
-        private Button btnExportar;        // ← NUEVO
+        private Button btnExportar;
         private GroupBox grpRegistro;
         private GroupBox grpBusqueda;
         private GroupBox grpResultados;
         private DataGridView dgvVehiculos;
+
+        // Labels de validación
+        private Label lblErrorTipo;
+        private Label lblErrorMarca;
+        private Label lblErrorModelo;
+        private Label lblErrorAño;
+        private Label lblErrorPrecio;
+        private Label lblErrorCaracteristica;
 
         // ── ICatalogoView ────────────────────────────────────────
         public string TipoSeleccionado => comboTipo.SelectedItem?.ToString() ?? "";
@@ -92,6 +100,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             txtPrecio.Clear(); txtColor.Clear(); txtCaracteristica.Clear();
             comboTipo.SelectedIndex = -1;
             txtCaracteristica.Visible = false;
+            LimpiarErrores();
         }
 
         // ── ICatalogoObserver ────────────────────────────────────
@@ -146,6 +155,14 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, System.Drawing.Color.FromArgb(46, 134, 193));
             btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, System.Drawing.Color.FromArgb(39, 174, 96));
 
+            // Labels de validación
+            lblErrorTipo = CrearLabelError(new Point(15, 58));
+            lblErrorMarca = CrearLabelError(new Point(15, 93));
+            lblErrorModelo = CrearLabelError(new Point(15, 128));
+            lblErrorAño = CrearLabelError(new Point(15, 163));
+            lblErrorPrecio = CrearLabelError(new Point(15, 198));
+            lblErrorCaracteristica = CrearLabelError(new Point(15, 268));
+
             grpRegistro.Controls.Add(comboTipo);
             grpRegistro.Controls.Add(txtMarca);
             grpRegistro.Controls.Add(txtModelo);
@@ -155,6 +172,12 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             grpRegistro.Controls.Add(txtCaracteristica);
             grpRegistro.Controls.Add(btnRegistrar);
             grpRegistro.Controls.Add(btnMostrar);
+            grpRegistro.Controls.Add(lblErrorTipo);
+            grpRegistro.Controls.Add(lblErrorMarca);
+            grpRegistro.Controls.Add(lblErrorModelo);
+            grpRegistro.Controls.Add(lblErrorAño);
+            grpRegistro.Controls.Add(lblErrorPrecio);
+            grpRegistro.Controls.Add(lblErrorCaracteristica);
 
             grpBusqueda = new GroupBox();
             grpBusqueda.Text = "Búsqueda y Eliminación";
@@ -173,7 +196,6 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             grpBusqueda.Controls.Add(btnBuscar);
             grpBusqueda.Controls.Add(btnEliminar);
 
-            // ── Botones externos ─────────────────────────────────
             btnDashboard = CrearBoton("📊 Dashboard", new Point(450, 240),
                 new Size(180, 40), System.Drawing.Color.FromArgb(142, 68, 173));
 
@@ -197,8 +219,20 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(grpRegistro);
             this.Controls.Add(grpBusqueda);
             this.Controls.Add(btnDashboard);
-            this.Controls.Add(btnExportar);        // ← NUEVO
+            this.Controls.Add(btnExportar);
             this.Controls.Add(grpResultados);
+        }
+
+        private Label CrearLabelError(Point location)
+        {
+            return new Label()
+            {
+                Location = location,
+                AutoSize = true,
+                ForeColor = System.Drawing.Color.FromArgb(192, 57, 43),
+                Font = new Font("Segoe UI", 7.5f, FontStyle.Italic),
+                Text = ""
+            };
         }
 
         private Button CrearBoton(string texto, Point location, Size size, System.Drawing.Color colorBoton)
@@ -215,9 +249,96 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             return btn;
         }
 
+        private void LimpiarErrores()
+        {
+            lblErrorTipo.Text = "";
+            lblErrorMarca.Text = "";
+            lblErrorModelo.Text = "";
+            lblErrorAño.Text = "";
+            lblErrorPrecio.Text = "";
+            lblErrorCaracteristica.Text = "";
+
+            comboTipo.BackColor = System.Drawing.Color.White;
+            txtMarca.BackColor = System.Drawing.Color.White;
+            txtModelo.BackColor = System.Drawing.Color.White;
+            txtAño.BackColor = System.Drawing.Color.White;
+            txtPrecio.BackColor = System.Drawing.Color.White;
+            txtCaracteristica.BackColor = System.Drawing.Color.White;
+        }
+
+        private bool ValidarFormulario()
+        {
+            LimpiarErrores();
+            bool valido = true;
+
+            if (comboTipo.SelectedItem == null)
+            {
+                lblErrorTipo.Text = "⚠ Seleccione un tipo de vehículo";
+                comboTipo.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                valido = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtMarca.Text))
+            {
+                lblErrorMarca.Text = "⚠ La marca es obligatoria";
+                txtMarca.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                valido = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtModelo.Text))
+            {
+                lblErrorModelo.Text = "⚠ El modelo es obligatorio";
+                txtModelo.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                valido = false;
+            }
+
+            if (!int.TryParse(txtAño.Text, out int año) || año < 1900 || año > DateTime.Now.Year)
+            {
+                lblErrorAño.Text = $"⚠ Año válido entre 1900 y {DateTime.Now.Year}";
+                txtAño.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                valido = false;
+            }
+
+            if (!double.TryParse(txtPrecio.Text, out double precio) || precio <= 0)
+            {
+                lblErrorPrecio.Text = "⚠ Precio debe ser mayor a 0";
+                txtPrecio.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                valido = false;
+            }
+
+            if (comboTipo.SelectedItem != null)
+            {
+                string tipo = comboTipo.SelectedItem.ToString()!;
+                if (tipo == "Camion" && !double.TryParse(txtCaracteristica.Text, out _))
+                {
+                    lblErrorCaracteristica.Text = "⚠ Peso debe ser un número válido";
+                    txtCaracteristica.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                    valido = false;
+                }
+                if (tipo == "Automovil" && !int.TryParse(txtCaracteristica.Text, out _))
+                {
+                    lblErrorCaracteristica.Text = "⚠ Puertas debe ser un número entero";
+                    txtCaracteristica.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                    valido = false;
+                }
+                if (tipo == "Motocicleta" && string.IsNullOrWhiteSpace(txtCaracteristica.Text))
+                {
+                    lblErrorCaracteristica.Text = "⚠ El tipo de moto es obligatorio";
+                    txtCaracteristica.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
+                    valido = false;
+                }
+            }
+
+            return valido;
+        }
+
         private void WireEvents()
         {
-            btnRegistrar.Click += (s, e) => _presenter.RegistrarVehiculo();
+            btnRegistrar.Click += (s, e) =>
+            {
+                if (ValidarFormulario())
+                    _presenter.RegistrarVehiculo();
+            };
             btnMostrar.Click += (s, e) => _presenter.CargarVehiculos();
             btnBuscar.Click += (s, e) => _presenter.BuscarVehiculo();
             btnEliminar.Click += (s, e) => _presenter.EliminarVehiculo();
@@ -226,7 +347,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                 var dashboard = new FormDashboard(_servicio.ObtenerTodos());
                 dashboard.ShowDialog();
             };
-            btnExportar.Click += (s, e) =>         // ← NUEVO
+            btnExportar.Click += (s, e) =>
             {
                 try
                 {
