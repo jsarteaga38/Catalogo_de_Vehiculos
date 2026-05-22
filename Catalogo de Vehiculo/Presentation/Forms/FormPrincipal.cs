@@ -27,7 +27,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         private Button btnMostrar;
         private Button btnBuscar;
         private Button btnEliminar;
-        private Button btnDashboard;        // ← NUEVO
+        private Button btnDashboard;
+        private Button btnExportar;        // ← NUEVO
         private GroupBox grpRegistro;
         private GroupBox grpBusqueda;
         private GroupBox grpResultados;
@@ -172,9 +173,12 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             grpBusqueda.Controls.Add(btnBuscar);
             grpBusqueda.Controls.Add(btnEliminar);
 
-            // ── Botón Dashboard ──────────────────────────────────
+            // ── Botones externos ─────────────────────────────────
             btnDashboard = CrearBoton("📊 Dashboard", new Point(450, 240),
                 new Size(180, 40), System.Drawing.Color.FromArgb(142, 68, 173));
+
+            btnExportar = CrearBoton("📥 Exportar Excel", new Point(650, 240),
+                new Size(180, 40), System.Drawing.Color.FromArgb(39, 174, 96));
 
             grpResultados = new GroupBox();
             grpResultados.Text = "Listado de Vehículos";
@@ -192,7 +196,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
             this.Controls.Add(grpRegistro);
             this.Controls.Add(grpBusqueda);
-            this.Controls.Add(btnDashboard);    // ← NUEVO
+            this.Controls.Add(btnDashboard);
+            this.Controls.Add(btnExportar);        // ← NUEVO
             this.Controls.Add(grpResultados);
         }
 
@@ -216,10 +221,23 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             btnMostrar.Click += (s, e) => _presenter.CargarVehiculos();
             btnBuscar.Click += (s, e) => _presenter.BuscarVehiculo();
             btnEliminar.Click += (s, e) => _presenter.EliminarVehiculo();
-            btnDashboard.Click += (s, e) =>     // ← NUEVO
+            btnDashboard.Click += (s, e) =>
             {
                 var dashboard = new FormDashboard(_servicio.ObtenerTodos());
                 dashboard.ShowDialog();
+            };
+            btnExportar.Click += (s, e) =>         // ← NUEVO
+            {
+                try
+                {
+                    var exportService = new ExportService();
+                    string ruta = exportService.ExportarAExcel(_servicio.ObtenerTodos());
+                    MostrarMensaje($"Archivo exportado en:\n{ruta}", "Exportación exitosa");
+                }
+                catch (Exception ex)
+                {
+                    MostrarMensaje("Error al exportar: " + ex.Message, "Error", true);
+                }
             };
             comboTipo.SelectedIndexChanged += ComboTipo_SelectedIndexChanged;
             txtMarca.TextChanged += (s, e) => UpdateUIState();
