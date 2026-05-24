@@ -29,6 +29,9 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         private Button btnEliminar;
         private Button btnDashboard;
         private Button btnExportar;
+        private Button btnEmpleados;
+        private Button btnVentas;
+        private Button btnMantenimientos;
         private GroupBox grpRegistro;
         private GroupBox grpBusqueda;
         private GroupBox grpResultados;
@@ -65,6 +68,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             dgvVehiculos.Columns.Add("Caracteristica", "Característica");
             dgvVehiculos.Columns.Add("Depreciacion", "Depreciación ($)");
             dgvVehiculos.Columns.Add("ValorActual", "Valor Actual ($)");
+            dgvVehiculos.Columns.Add("Estado", "Estado");
 
             foreach (Vehiculo vehiculo in lista)
             {
@@ -83,7 +87,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                     vehiculo.Marca, vehiculo.Modelo, vehiculo.Año,
                     vehiculo.Precio.ToString("F2"), vehiculo.Color,
                     caracteristica, depreciacion.ToString("F2"),
-                    valorActual.ToString("F2")
+                    valorActual.ToString("F2"), vehiculo.Estado
                 );
             }
         }
@@ -127,13 +131,14 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
         private void InicializarUI()
         {
             this.Text = "Sistema Empresarial - Catálogo de Vehículos";
-            this.Size = new Size(900, 600);
+            this.Size = new Size(900, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = System.Drawing.Color.FromArgb(240, 242, 245);
             this.Font = new Font("Segoe UI", 10);
 
             Size buttonSize = new Size(130, 40);
 
+            // ── Grupo Registro ───────────────────────────────────
             grpRegistro = new GroupBox();
             grpRegistro.Text = "Registro de Vehículo";
             grpRegistro.Location = new Point(20, 20);
@@ -155,7 +160,6 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, System.Drawing.Color.FromArgb(46, 134, 193));
             btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, System.Drawing.Color.FromArgb(39, 174, 96));
 
-            // Labels de validación
             lblErrorTipo = CrearLabelError(new Point(15, 58));
             lblErrorMarca = CrearLabelError(new Point(15, 93));
             lblErrorModelo = CrearLabelError(new Point(15, 128));
@@ -179,33 +183,45 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             grpRegistro.Controls.Add(lblErrorPrecio);
             grpRegistro.Controls.Add(lblErrorCaracteristica);
 
+            // ── Grupo Búsqueda ───────────────────────────────────
             grpBusqueda = new GroupBox();
             grpBusqueda.Text = "Búsqueda y Eliminación";
             grpBusqueda.Location = new Point(450, 20);
-            grpBusqueda.Size = new Size(400, 200);
+            grpBusqueda.Size = new Size(420, 120);
 
             txtBuscarMarca = new TextBox();
             txtBuscarMarca.Location = new Point(20, 40);
-            txtBuscarMarca.Width = 340;
+            txtBuscarMarca.Width = 360;
             txtBuscarMarca.PlaceholderText = "Buscar por Marca";
 
-            btnBuscar = CrearBoton("Buscar", new Point(20, 90), buttonSize, System.Drawing.Color.FromArgb(52, 152, 219));
-            btnEliminar = CrearBoton("Eliminar", new Point(170, 90), buttonSize, System.Drawing.Color.FromArgb(192, 57, 43));
+            btnBuscar = CrearBoton("Buscar", new Point(20, 75), new Size(120, 35), System.Drawing.Color.FromArgb(52, 152, 219));
+            btnEliminar = CrearBoton("Eliminar", new Point(155, 75), new Size(120, 35), System.Drawing.Color.FromArgb(192, 57, 43));
 
             grpBusqueda.Controls.Add(txtBuscarMarca);
             grpBusqueda.Controls.Add(btnBuscar);
             grpBusqueda.Controls.Add(btnEliminar);
 
-            btnDashboard = CrearBoton("📊 Dashboard", new Point(450, 240),
-                new Size(180, 40), System.Drawing.Color.FromArgb(142, 68, 173));
+            // ── Botones módulos ──────────────────────────────────
+            btnDashboard = CrearBoton("📊 Dashboard", new Point(450, 155),
+                new Size(130, 38), System.Drawing.Color.FromArgb(142, 68, 173));
 
-            btnExportar = CrearBoton("📥 Exportar Excel", new Point(650, 240),
-                new Size(180, 40), System.Drawing.Color.FromArgb(39, 174, 96));
+            btnExportar = CrearBoton("📥 Excel", new Point(590, 155),
+                new Size(130, 38), System.Drawing.Color.FromArgb(39, 174, 96));
 
+            btnEmpleados = CrearBoton("👥 Empleados", new Point(730, 155),
+                new Size(140, 38), System.Drawing.Color.FromArgb(41, 128, 185));
+
+            btnVentas = CrearBoton("💰 Ventas", new Point(450, 203),
+                new Size(130, 38), System.Drawing.Color.FromArgb(243, 156, 18));
+
+            btnMantenimientos = CrearBoton("🔧 Mantenimientos", new Point(590, 203),
+                new Size(280, 38), System.Drawing.Color.FromArgb(22, 160, 133));
+
+            // ── Grupo Resultados ─────────────────────────────────
             grpResultados = new GroupBox();
             grpResultados.Text = "Listado de Vehículos";
-            grpResultados.Location = new Point(20, 380);
-            grpResultados.Size = new Size(830, 180);
+            grpResultados.Location = new Point(20, 370);
+            grpResultados.Size = new Size(850, 230);
 
             dgvVehiculos = new DataGridView();
             dgvVehiculos.Dock = DockStyle.Fill;
@@ -213,6 +229,14 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             dgvVehiculos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvVehiculos.BackgroundColor = System.Drawing.Color.White;
             dgvVehiculos.AllowUserToAddRows = false;
+            dgvVehiculos.RowHeadersVisible = false;
+            dgvVehiculos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvVehiculos.BorderStyle = BorderStyle.None;
+            dgvVehiculos.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(44, 62, 80);
+            dgvVehiculos.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.White;
+            dgvVehiculos.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            dgvVehiculos.EnableHeadersVisualStyles = false;
+            dgvVehiculos.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(245, 247, 250);
 
             grpResultados.Controls.Add(dgvVehiculos);
 
@@ -220,6 +244,9 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(grpBusqueda);
             this.Controls.Add(btnDashboard);
             this.Controls.Add(btnExportar);
+            this.Controls.Add(btnEmpleados);
+            this.Controls.Add(btnVentas);
+            this.Controls.Add(btnMantenimientos);
             this.Controls.Add(grpResultados);
         }
 
@@ -277,35 +304,30 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                 comboTipo.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
                 valido = false;
             }
-
             if (string.IsNullOrWhiteSpace(txtMarca.Text))
             {
                 lblErrorMarca.Text = "⚠ La marca es obligatoria";
                 txtMarca.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
                 valido = false;
             }
-
             if (string.IsNullOrWhiteSpace(txtModelo.Text))
             {
                 lblErrorModelo.Text = "⚠ El modelo es obligatorio";
                 txtModelo.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
                 valido = false;
             }
-
             if (!int.TryParse(txtAño.Text, out int año) || año < 1900 || año > DateTime.Now.Year)
             {
                 lblErrorAño.Text = $"⚠ Año válido entre 1900 y {DateTime.Now.Year}";
                 txtAño.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
                 valido = false;
             }
-
             if (!double.TryParse(txtPrecio.Text, out double precio) || precio <= 0)
             {
                 lblErrorPrecio.Text = "⚠ Precio debe ser mayor a 0";
                 txtPrecio.BackColor = System.Drawing.Color.FromArgb(255, 235, 235);
                 valido = false;
             }
-
             if (comboTipo.SelectedItem != null)
             {
                 string tipo = comboTipo.SelectedItem.ToString()!;
@@ -328,7 +350,6 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                     valido = false;
                 }
             }
-
             return valido;
         }
 
@@ -359,6 +380,23 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
                 {
                     MostrarMensaje("Error al exportar: " + ex.Message, "Error", true);
                 }
+            };
+            btnEmpleados.Click += (s, e) =>
+            {
+                var form = new FormEmpleados(_servicio.GetConnectionString());
+                form.ShowDialog();
+            };
+            btnVentas.Click += (s, e) =>
+            {
+                var form = new FormVentas(_servicio.GetConnectionString());
+                form.ShowDialog();
+                _presenter.CargarVehiculos();
+            };
+            btnMantenimientos.Click += (s, e) =>
+            {
+                var form = new FormMantenimientos(_servicio.GetConnectionString());
+                form.ShowDialog();
+                _presenter.CargarVehiculos();
             };
             comboTipo.SelectedIndexChanged += ComboTipo_SelectedIndexChanged;
             txtMarca.TextChanged += (s, e) => UpdateUIState();
