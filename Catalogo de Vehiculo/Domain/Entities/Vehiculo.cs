@@ -8,7 +8,7 @@
         public int Año { get; set; }
         public double Precio { get; set; }
         public string Color { get; set; } = "";
-
+        public string Estado { get; set; } = "Disponible";
         protected Vehiculo(string marca, string modelo, int año, double precio, string color)
         {
             // RN-05: Precio mayor a cero
@@ -31,6 +31,7 @@
             Año = año;
             Precio = precio;
             Color = color;
+
         }
 
         public abstract double CalcularDepreciacion();
