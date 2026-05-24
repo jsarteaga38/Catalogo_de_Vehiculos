@@ -15,11 +15,8 @@ namespace Catalogo_de_Vehiculo.Domain.Entities
 
         public override double CalcularDepreciacion()
         {
-            int antiguedad = DateTime.Now.Year - Año;
-            double depreciacion = Precio * (0.08 * antiguedad);
-
-            // RN-02: La depreciación no puede superar el 100% del precio base
-            return Math.Min(depreciacion, Precio);
+            int antiguedad = Math.Min(DateTime.Now.Year - Año, 15);
+            return Precio * (0.08 * antiguedad);
         }
 
         public override double CalcularCostoMantenimiento()
