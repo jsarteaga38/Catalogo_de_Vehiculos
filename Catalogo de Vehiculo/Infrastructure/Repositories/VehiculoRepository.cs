@@ -124,20 +124,30 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
             double precio = Convert.ToDouble(reader["Precio"]);
             string color = reader["Color"].ToString()!;
             string caracteristica = reader["Caracteristica"].ToString()!;
+            string estado = reader["Estado"].ToString()!;
+            int id = Convert.ToInt32(reader["Id"]);
 
+            Vehiculo? v = null;
             switch (tipo)
             {
                 case "Automovil":
                     int puertas = int.TryParse(caracteristica, out int p) ? p : 0;
-                    return new Automovil(marca, modelo, año, precio, color, puertas);
+                    v = new Automovil(marca, modelo, año, precio, color, puertas);
+                    break;
                 case "Motocicleta":
-                    return new Motocicleta(marca, modelo, año, precio, color, caracteristica);
+                    v = new Motocicleta(marca, modelo, año, precio, color, caracteristica);
+                    break;
                 case "Camion":
                     double peso = double.TryParse(caracteristica, out double ps) ? ps : 0;
-                    return new Camion(marca, modelo, año, precio, color, peso);
+                    v = new Camion(marca, modelo, año, precio, color, peso);
+                    break;
                 default:
                     return null!;
             }
+
+            v.Id = id;
+            v.Estado = estado;
+            return v;
         }
 
         private string ObtenerCaracteristica(Vehiculo vehiculo)
