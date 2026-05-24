@@ -15,6 +15,8 @@ namespace Catalogo_de_Vehiculo.Infrastructure.Repositories
             _connectionString = connectionString;
         }
 
+        public string GetConnectionString() => _connectionString;
+
         public void Agregar(Vehiculo vehiculo)
         {
             string tipo = vehiculo.GetType().Name;
