@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Catalogo_de_Vehiculo.Domain.Entities;
 using Catalogo_de_Vehiculo.Domain.Interfaces;
+using Catalogo_de_Vehiculo.Infrastructure.Repositories;
 
 namespace Catalogo_de_Vehiculo.Application.Services
 {
@@ -82,6 +83,11 @@ namespace Catalogo_de_Vehiculo.Application.Services
             foreach (Vehiculo v in ObtenerTodos())
                 total += v.CalcularCostoMantenimiento();
             return total;
+        }
+
+        public string GetConnectionString()
+        {
+            return (_repositorio as VehiculoRepository)?.GetConnectionString() ?? "";
         }
     }
 }

@@ -365,8 +365,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             btnEliminar.Click += (s, e) => _presenter.EliminarVehiculo();
             btnDashboard.Click += (s, e) =>
             {
-                var dashboard = new FormDashboard(_servicio.ObtenerTodos());
-                dashboard.ShowDialog();
+                var dashboard = new FormDashboard(_servicio.ObtenerTodos(), _servicio.GetConnectionString()); dashboard.ShowDialog();
             };
             btnExportar.Click += (s, e) =>
             {
