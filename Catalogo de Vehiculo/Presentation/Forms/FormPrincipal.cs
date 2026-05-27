@@ -133,7 +133,7 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Text = "Sistema Empresarial - Catálogo de Vehículos";
             this.Size = new Size(900, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = System.Drawing.Color.FromArgb(240, 242, 245);
+            this.BackColor = System.Drawing.Color.FromArgb(255, 240, 235);
             this.Font = new Font("Segoe UI", 10);
 
             Size buttonSize = new Size(130, 40);
@@ -157,8 +157,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             txtColor = new TextBox() { Location = new Point(20, 220), Width = 340, PlaceholderText = "Color" };
             txtCaracteristica = new TextBox() { Location = new Point(20, 255), Width = 340, Visible = false };
 
-            btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, System.Drawing.Color.FromArgb(46, 134, 193));
-            btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, System.Drawing.Color.FromArgb(39, 174, 96));
+            btnRegistrar = CrearBoton("Registrar", new Point(20, 290), buttonSize, System.Drawing.Color.FromArgb(2, 89, 221));
+            btnMostrar = CrearBoton("Mostrar", new Point(170, 290), buttonSize, System.Drawing.Color.FromArgb(132, 175, 251));
 
             lblErrorTipo = CrearLabelError(new Point(15, 58));
             lblErrorMarca = CrearLabelError(new Point(15, 93));
@@ -194,8 +194,8 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             txtBuscarMarca.Width = 360;
             txtBuscarMarca.PlaceholderText = "Buscar por Marca";
 
-            btnBuscar = CrearBoton("Buscar", new Point(20, 75), new Size(120, 35), System.Drawing.Color.FromArgb(52, 152, 219));
-            btnEliminar = CrearBoton("Eliminar", new Point(155, 75), new Size(120, 35), System.Drawing.Color.FromArgb(192, 57, 43));
+            btnBuscar = CrearBoton("Buscar", new Point(20, 75), new Size(120, 35), System.Drawing.Color.FromArgb(2, 89, 221));
+            btnEliminar = CrearBoton("Eliminar", new Point(155, 75), new Size(120, 35), System.Drawing.Color.FromArgb(255, 102, 72));
 
             grpBusqueda.Controls.Add(txtBuscarMarca);
             grpBusqueda.Controls.Add(btnBuscar);
@@ -203,19 +203,19 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
 
             // ── Botones módulos ──────────────────────────────────
             btnDashboard = CrearBoton("📊 Dashboard", new Point(450, 155),
-                new Size(130, 38), System.Drawing.Color.FromArgb(142, 68, 173));
+                new Size(130, 38), System.Drawing.Color.FromArgb(2, 89, 221));
 
             btnExportar = CrearBoton("📥 Excel", new Point(590, 155),
-                new Size(130, 38), System.Drawing.Color.FromArgb(39, 174, 96));
+                new Size(130, 38), System.Drawing.Color.FromArgb(255, 102, 72));
 
             btnEmpleados = CrearBoton("👥 Empleados", new Point(730, 155),
-                new Size(140, 38), System.Drawing.Color.FromArgb(41, 128, 185));
+                new Size(140, 38), System.Drawing.Color.FromArgb(2, 89, 221));
 
             btnVentas = CrearBoton("💰 Ventas", new Point(450, 203),
-                new Size(130, 38), System.Drawing.Color.FromArgb(243, 156, 18));
+                new Size(130, 38), System.Drawing.Color.FromArgb(2, 89, 221));
 
             btnMantenimientos = CrearBoton("🔧 Mantenimientos", new Point(590, 203),
-                new Size(280, 38), System.Drawing.Color.FromArgb(22, 160, 133));
+                new Size(280, 38), System.Drawing.Color.FromArgb(255, 102, 72));
 
             // ── Grupo Resultados ─────────────────────────────────
             grpResultados = new GroupBox();
@@ -272,7 +272,12 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             btn.ForeColor = System.Drawing.Color.White;
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(
+                Math.Max(0, colorBoton.R - 20),
+                Math.Max(0, colorBoton.G - 20),
+                Math.Max(0, colorBoton.B - 20));
             btn.Cursor = Cursors.Hand;
+            btn.Font = new Font("Segoe UI", 9, FontStyle.Bold);
             return btn;
         }
 
