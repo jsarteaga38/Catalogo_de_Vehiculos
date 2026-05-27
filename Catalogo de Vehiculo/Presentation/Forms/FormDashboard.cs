@@ -61,13 +61,13 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(lblTipoTitulo);
 
             CrearTarjeta("🚗 Automóviles", automoviles.ToString(),
-                System.Drawing.Color.FromArgb(106, 27, 154), new Point(20, 80));
+                System.Drawing.Color.FromArgb(255, 102, 72), new Point(20, 80));
             CrearTarjeta("🚛 Camiones", camiones.ToString(),
-                System.Drawing.Color.FromArgb(142, 68, 173), new Point(200, 80));
+                System.Drawing.Color.FromArgb(220, 70, 45), new Point(200, 80));
             CrearTarjeta("🏍 Motocicletas", motos.ToString(),
-                System.Drawing.Color.FromArgb(171, 112, 200), new Point(380, 80));
+                System.Drawing.Color.FromArgb(255, 140, 110), new Point(380, 80));
             CrearTarjeta("🚘 Total", _vehiculos.Count.ToString(),
-                System.Drawing.Color.FromArgb(74, 20, 104), new Point(560, 80));
+                System.Drawing.Color.FromArgb(180, 50, 30), new Point(560, 80));
 
             // ── Tarjetas por estado ──────────────────────────────
             Label lblEstadoTitulo = new Label();
@@ -79,11 +79,11 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(lblEstadoTitulo);
 
             CrearTarjeta("✅ Disponibles", disponibles.ToString(),
-                System.Drawing.Color.FromArgb(106, 27, 154), new Point(20, 220));
+                System.Drawing.Color.FromArgb(255, 102, 72), new Point(20, 220));
             CrearTarjeta("💰 Vendidos", vendidos.ToString(),
-                System.Drawing.Color.FromArgb(106, 27, 154), new Point(200, 220));
+                System.Drawing.Color.FromArgb(255, 102, 72), new Point(200, 220));
             CrearTarjeta("🔧 En Mantenimiento", enMantenimiento.ToString(),
-                System.Drawing.Color.FromArgb(106, 27, 154), new Point(380, 220));
+                System.Drawing.Color.FromArgb(255, 102, 72), new Point(380, 220));
 
             // ── Tarjetas financieras ─────────────────────────────
             Label lblFinTitulo = new Label();
@@ -95,13 +95,13 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             this.Controls.Add(lblFinTitulo);
 
             CrearTarjetaFinanciera("💵 Total Invertido", totalInvertido.ToString("C"),
-                System.Drawing.Color.FromArgb(44, 62, 80), new Point(20, 360));
+                System.Drawing.Color.FromArgb(180, 50, 30), new Point(20, 360));
             CrearTarjetaFinanciera("💰 Valor Actual Flota", valorFlota.ToString("C"),
-                System.Drawing.Color.FromArgb(142, 68, 173), new Point(270, 360));
+                System.Drawing.Color.FromArgb(255, 102, 72), new Point(270, 360));
             CrearTarjetaFinanciera("📉 Depreciación Total", depreciacion.ToString("C"),
-                System.Drawing.Color.FromArgb(231, 76, 60), new Point(520, 360));
+                System.Drawing.Color.FromArgb(220, 70, 45), new Point(520, 360));
             CrearTarjetaFinanciera("🔧 Mantenimiento Total", mantenimiento.ToString("C"),
-                System.Drawing.Color.FromArgb(172, 112, 200), new Point(770, 360));
+                System.Drawing.Color.FromArgb(255, 140, 110), new Point(770, 360));
 
             // ── Gráfica de barras ────────────────────────────────
             Label lblGrafica = new Label();
@@ -192,14 +192,15 @@ namespace Catalogo_de_Vehiculo.Presentation.Forms
             string[] labelsEstado = { "Disponibles", "Vendidos", "En Mantenimiento" };
 
             System.Drawing.Color[] coloresTipo = {
-                System.Drawing.Color.FromArgb(52, 152, 219),
-                System.Drawing.Color.FromArgb(231, 76, 60),
-                System.Drawing.Color.FromArgb(39, 174, 96)
+            System.Drawing.Color.FromArgb(255, 102, 72),   // rojo naranja
+            System.Drawing.Color.FromArgb(220, 70, 45),    // rojo oscuro
+            System.Drawing.Color.FromArgb(255, 140, 110),  // rojo claro
             };
+
             System.Drawing.Color[] coloresEstado = {
-                System.Drawing.Color.FromArgb(39, 174, 96),
-                System.Drawing.Color.FromArgb(243, 156, 18),
-                System.Drawing.Color.FromArgb(142, 68, 173)
+            System.Drawing.Color.FromArgb(180, 50, 30),    // rojo muy oscuro
+            System.Drawing.Color.FromArgb(255, 102, 72),   // rojo naranja
+            System.Drawing.Color.FromArgb(255, 140, 110),  // rojo claro
             };
 
             int maxVal = Math.Max(
